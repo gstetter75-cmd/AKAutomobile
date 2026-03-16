@@ -17,8 +17,8 @@ const vehicleData = [
     fuel: "Benzin",
     badge: "Top-Angebot",
     images: [
-      "https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg?auto=compress&cs=tinysrgb&w=800",
-      "https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg?auto=compress&cs=tinysrgb&w=400"
+      "https://images.pexels.com/photos/19292927/pexels-photo-19292927.jpeg?auto=compress&cs=tinysrgb&w=800",
+      "https://images.pexels.com/photos/19292927/pexels-photo-19292927.jpeg?auto=compress&cs=tinysrgb&w=400"
     ],
     specs: {
       hp: 95,
@@ -45,8 +45,8 @@ const vehicleData = [
     category: "kleinwagen",
     fuel: "Benzin",
     images: [
-      "https://images.pexels.com/photos/1545743/pexels-photo-1545743.jpeg?auto=compress&cs=tinysrgb&w=800",
-      "https://images.pexels.com/photos/1545743/pexels-photo-1545743.jpeg?auto=compress&cs=tinysrgb&w=400"
+      "https://images.pexels.com/photos/18305913/pexels-photo-18305913.jpeg?auto=compress&cs=tinysrgb&w=800",
+      "https://images.pexels.com/photos/17260495/pexels-photo-17260495.jpeg?auto=compress&cs=tinysrgb&w=400"
     ],
     specs: {
       hp: 100,
@@ -73,8 +73,8 @@ const vehicleData = [
     category: "kleinwagen",
     fuel: "Benzin",
     images: [
-      "https://images.pexels.com/photos/1592384/pexels-photo-1592384.jpeg?auto=compress&cs=tinysrgb&w=800",
-      "https://images.pexels.com/photos/1592384/pexels-photo-1592384.jpeg?auto=compress&cs=tinysrgb&w=400"
+      "https://images.pexels.com/photos/12310882/pexels-photo-12310882.jpeg?auto=compress&cs=tinysrgb&w=800",
+      "https://images.pexels.com/photos/12310882/pexels-photo-12310882.jpeg?auto=compress&cs=tinysrgb&w=400"
     ],
     specs: {
       hp: 125,
@@ -104,8 +104,8 @@ const vehicleData = [
     fuel: "Benzin",
     badge: "Bestseller",
     images: [
-      "https://images.pexels.com/photos/1592384/pexels-photo-1592384.jpeg?auto=compress&cs=tinysrgb&w=800",
-      "https://images.pexels.com/photos/1592384/pexels-photo-1592384.jpeg?auto=compress&cs=tinysrgb&w=400"
+      "https://images.pexels.com/photos/18690927/pexels-photo-18690927.jpeg?auto=compress&cs=tinysrgb&w=800",
+      "https://images.pexels.com/photos/10843557/pexels-photo-10843557.jpeg?auto=compress&cs=tinysrgb&w=400"
     ],
     specs: {
       hp: 150,
@@ -132,8 +132,8 @@ const vehicleData = [
     category: "kompakt",
     fuel: "Benzin",
     images: [
-      "https://images.pexels.com/photos/100656/pexels-photo-100656.jpeg?auto=compress&cs=tinysrgb&w=800",
-      "https://images.pexels.com/photos/100656/pexels-photo-100656.jpeg?auto=compress&cs=tinysrgb&w=400"
+      "https://images.pexels.com/photos/1007410/pexels-photo-1007410.jpeg?auto=compress&cs=tinysrgb&w=800",
+      "https://images.pexels.com/photos/1007410/pexels-photo-1007410.jpeg?auto=compress&cs=tinysrgb&w=400"
     ],
     specs: {
       hp: 150,
@@ -160,8 +160,8 @@ const vehicleData = [
     category: "kompakt",
     fuel: "Diesel",
     images: [
-      "https://images.pexels.com/photos/3874337/pexels-photo-3874337.jpeg?auto=compress&cs=tinysrgb&w=800",
-      "https://images.pexels.com/photos/3874337/pexels-photo-3874337.jpeg?auto=compress&cs=tinysrgb&w=400"
+      "https://images.pexels.com/photos/12007134/pexels-photo-12007134.jpeg?auto=compress&cs=tinysrgb&w=800",
+      "https://images.pexels.com/photos/12007134/pexels-photo-12007134.jpeg?auto=compress&cs=tinysrgb&w=400"
     ],
     specs: {
       hp: 136,
@@ -191,8 +191,8 @@ const vehicleData = [
     fuel: "Diesel",
     badge: "Premium",
     images: [
-      "https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg?auto=compress&cs=tinysrgb&w=800",
-      "https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg?auto=compress&cs=tinysrgb&w=400"
+      "https://images.pexels.com/photos/28775849/pexels-photo-28775849.jpeg?auto=compress&cs=tinysrgb&w=800",
+      "https://images.pexels.com/photos/18346527/pexels-photo-18346527.jpeg?auto=compress&cs=tinysrgb&w=400"
     ],
     specs: {
       hp: 190,
@@ -219,8 +219,8 @@ const vehicleData = [
     category: "mittelklasse",
     fuel: "Diesel",
     images: [
-      "https://images.pexels.com/photos/892522/pexels-photo-892522.jpeg?auto=compress&cs=tinysrgb&w=800",
-      "https://images.pexels.com/photos/892522/pexels-photo-892522.jpeg?auto=compress&cs=tinysrgb&w=400"
+      "https://images.pexels.com/photos/18518090/pexels-photo-18518090.jpeg?auto=compress&cs=tinysrgb&w=800",
+      "https://images.pexels.com/photos/18518090/pexels-photo-18518090.jpeg?auto=compress&cs=tinysrgb&w=400"
     ],
     specs: {
       hp: 204,
@@ -247,8 +247,8 @@ const vehicleData = [
     category: "mittelklasse",
     fuel: "Diesel",
     images: [
-      "https://images.pexels.com/photos/1149137/pexels-photo-1149137.jpeg?auto=compress&cs=tinysrgb&w=800",
-      "https://images.pexels.com/photos/1149137/pexels-photo-1149137.jpeg?auto=compress&cs=tinysrgb&w=400"
+      "https://images.pexels.com/photos/10224502/pexels-photo-10224502.jpeg?auto=compress&cs=tinysrgb&w=800",
+      "https://images.pexels.com/photos/4003126/pexels-photo-4003126.jpeg?auto=compress&cs=tinysrgb&w=400"
     ],
     specs: {
       hp: 200,
@@ -277,8 +277,8 @@ const vehicleData = [
     category: "kombi",
     fuel: "Diesel",
     images: [
-      "https://images.pexels.com/photos/3786091/pexels-photo-3786091.jpeg?auto=compress&cs=tinysrgb&w=800",
-      "https://images.pexels.com/photos/3786091/pexels-photo-3786091.jpeg?auto=compress&cs=tinysrgb&w=400"
+      "https://images.pexels.com/photos/19244016/pexels-photo-19244016.jpeg?auto=compress&cs=tinysrgb&w=800",
+      "https://images.pexels.com/photos/19244016/pexels-photo-19244016.jpeg?auto=compress&cs=tinysrgb&w=400"
     ],
     specs: {
       hp: 150,
@@ -337,8 +337,8 @@ const vehicleData = [
     fuel: "Hybrid",
     badge: "Eco-Tipp",
     images: [
-      "https://images.pexels.com/photos/120049/pexels-photo-120049.jpeg?auto=compress&cs=tinysrgb&w=800",
-      "https://images.pexels.com/photos/120049/pexels-photo-120049.jpeg?auto=compress&cs=tinysrgb&w=400"
+      "https://images.pexels.com/photos/1134857/pexels-photo-1134857.jpeg?auto=compress&cs=tinysrgb&w=800",
+      "https://images.pexels.com/photos/1134857/pexels-photo-1134857.jpeg?auto=compress&cs=tinysrgb&w=400"
     ],
     specs: {
       hp: 230,
@@ -365,8 +365,8 @@ const vehicleData = [
     category: "suv",
     fuel: "Diesel",
     images: [
-      "https://images.pexels.com/photos/210182/pexels-photo-210182.jpeg?auto=compress&cs=tinysrgb&w=800",
-      "https://images.pexels.com/photos/210182/pexels-photo-210182.jpeg?auto=compress&cs=tinysrgb&w=400"
+      "https://images.pexels.com/photos/14038277/pexels-photo-14038277.jpeg?auto=compress&cs=tinysrgb&w=800",
+      "https://images.pexels.com/photos/14038277/pexels-photo-14038277.jpeg?auto=compress&cs=tinysrgb&w=400"
     ],
     specs: {
       hp: 150,

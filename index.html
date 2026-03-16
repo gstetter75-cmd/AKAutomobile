@@ -21,6 +21,9 @@
   <meta property="og:locale" content="de_DE">
   <meta property="og:locale:alternate" content="en_US">
 
+  <!-- Preload Hero Image -->
+  <link rel="preload" as="image" href="https://images.pexels.com/photos/1592384/pexels-photo-1592384.jpeg?auto=compress&cs=tinysrgb&w=800">
+
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -107,11 +110,11 @@
               <div class="hero-stat-label" data-i18n="hero.stat1.label">Fahrzeuge auf Lager</div>
             </div>
             <div class="hero-stat">
-              <div class="hero-stat-number" data-target="850">0</div>
+              <div class="hero-stat-number" data-target="850" data-suffix="+">0</div>
               <div class="hero-stat-label" data-i18n="hero.stat2.label">Zufriedene Kunden</div>
             </div>
             <div class="hero-stat">
-              <div class="hero-stat-number" data-target="15">0</div>
+              <div class="hero-stat-number" data-target="15" data-suffix="+">0</div>
               <div class="hero-stat-label" data-i18n="hero.stat3.label">Jahre Erfahrung</div>
             </div>
           </div>
@@ -360,11 +363,11 @@
 
             <div class="contact-map">
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2466.5!2d9.595!3d52.07!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNTLCsDA0JzEyLjAiTiA5wrAzNSc0Mi4wIkU!5e0!3m2!1sde!2sde!4v1!5m2!1sde!2sde"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d9880!2d9.5917!3d52.0667!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47b95e8c8e0a0001%3A0x4236659f00e77f0!2s31020%20Salzhemmendorf!5e0!3m2!1sde!2sde!4v1710000000000!5m2!1sde!2sde"
                 allowfullscreen=""
                 loading="lazy"
                 referrerpolicy="no-referrer-when-downgrade"
-                title="AK Automobile Standort">
+                title="AK Automobile Standort — 31020 Salzhemmendorf">
               </iframe>
             </div>
           </div>
@@ -484,65 +487,20 @@
     </div>
   </div>
 
+  <!-- Back to Top -->
+  <button class="back-to-top" id="backToTop" aria-label="Nach oben scrollen">&#x2191;</button>
+
+  <!-- Mobile CTA Bar -->
+  <div class="mobile-cta" id="mobileCTA">
+    <a href="tel:+495153123456" class="mobile-cta-btn mobile-cta-phone">&#x1F4DE; Anrufen</a>
+    <a href="#contact" class="mobile-cta-btn mobile-cta-contact">&#x2709; Anfrage</a>
+  </div>
+
   <!-- Scripts -->
   <script src="js/cookie-consent.js"></script>
   <script src="js/vehicles.js"></script>
   <script src="js/vehicle-modal.js"></script>
   <script src="js/i18n.js"></script>
   <script src="js/main.js"></script>
-
-  <!-- Render vehicle cards dynamically -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const grid = document.getElementById('vehiclesGrid');
-      const vehicleSelect = document.getElementById('vehicle');
-      const lang = document.documentElement.getAttribute('lang') || 'de';
-
-      if (grid && typeof vehicleData !== 'undefined') {
-        vehicleData.forEach(v => {
-          const badgeHtml = v.badge ? `<span class="vehicle-badge">${v.badge}</span>` : '';
-          const card = document.createElement('div');
-          card.className = 'vehicle-card fade-up';
-          card.setAttribute('data-vehicle-id', v.id);
-          card.setAttribute('data-category', v.category);
-
-          card.innerHTML = `
-            <div class="vehicle-card-image">
-              ${badgeHtml}
-              <img src="${v.images[0]}"
-                   alt="${v.name}"
-                   width="400" height="267"
-                   loading="lazy">
-            </div>
-            <div class="vehicle-card-body">
-              <div class="vehicle-card-brand">${v.brand}</div>
-              <h3 class="vehicle-card-name">${v.model}</h3>
-              <div class="vehicle-card-specs">
-                <span class="vehicle-card-spec">${v.year}</span>
-                <span class="vehicle-card-spec">${v.mileage}</span>
-                <span class="vehicle-card-spec">${v.specs.hp} PS</span>
-                <span class="vehicle-card-spec">${v.fuel || v.specs.fuel}</span>
-              </div>
-              <div class="vehicle-card-footer">
-                <span class="vehicle-card-price">${formatPrice(v.price)}</span>
-                <span class="vehicle-card-btn" data-i18n="vehicles.details">Details</span>
-              </div>
-            </div>
-          `;
-          grid.appendChild(card);
-        });
-      }
-
-      // Populate vehicle select in contact form
-      if (vehicleSelect && typeof vehicleData !== 'undefined') {
-        vehicleData.forEach(v => {
-          const option = document.createElement('option');
-          option.value = v.id;
-          option.textContent = `${v.name} — ${formatPrice(v.price)}`;
-          vehicleSelect.appendChild(option);
-        });
-      }
-    });
-  </script>
 </body>
 </html>

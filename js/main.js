@@ -6,6 +6,8 @@
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Cards MUST be rendered first — other inits depend on them
+  initVehicleCards();
   initNavigation();
   initScrollAnimations();
   initHeroCounters();
@@ -16,7 +18,63 @@ document.addEventListener('DOMContentLoaded', () => {
   initVehicleModal();
   initI18n();
   initCookieConsent();
+  initBackToTop();
+  initMobileCTA();
 });
+
+/* ---------- Vehicle Card Rendering ---------- */
+function initVehicleCards() {
+  const grid = document.getElementById('vehiclesGrid');
+  const vehicleSelect = document.getElementById('vehicle');
+
+  if (grid && typeof vehicleData !== 'undefined') {
+    vehicleData.forEach(v => {
+      const badgeHtml = v.badge ? `<span class="vehicle-badge">${v.badge}</span>` : '';
+      const card = document.createElement('div');
+      card.className = 'vehicle-card fade-up';
+      card.setAttribute('data-vehicle-id', v.id);
+      card.setAttribute('data-category', v.category);
+
+      card.innerHTML = `
+        <div class="vehicle-card-image">
+          ${badgeHtml}
+          <img src="${v.images[0]}"
+               alt="${v.name}"
+               width="400" height="267"
+               loading="lazy">
+        </div>
+        <div class="vehicle-card-body">
+          <div class="vehicle-card-brand">${v.brand}</div>
+          <h3 class="vehicle-card-name">${v.model}</h3>
+          <div class="vehicle-card-specs">
+            <span class="vehicle-card-spec">${v.year}</span>
+            <span class="vehicle-card-spec-dot">&middot;</span>
+            <span class="vehicle-card-spec">${v.mileage}</span>
+            <span class="vehicle-card-spec-dot">&middot;</span>
+            <span class="vehicle-card-spec">${v.specs.hp} PS</span>
+            <span class="vehicle-card-spec-dot">&middot;</span>
+            <span class="vehicle-card-spec">${v.fuel || v.specs.fuel}</span>
+          </div>
+          <div class="vehicle-card-footer">
+            <span class="vehicle-card-price">${formatPrice(v.price)}</span>
+            <span class="vehicle-card-btn">Details &rarr;</span>
+          </div>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  // Populate vehicle select in contact form
+  if (vehicleSelect && typeof vehicleData !== 'undefined') {
+    vehicleData.forEach(v => {
+      const option = document.createElement('option');
+      option.value = v.id;
+      option.textContent = `${v.name} — ${formatPrice(v.price)}`;
+      vehicleSelect.appendChild(option);
+    });
+  }
+}
 
 /* ---------- Navigation ---------- */
 function initNavigation() {
@@ -43,20 +101,15 @@ function initNavigation() {
 
   if (navToggle && navLinks) {
     navToggle.addEventListener('click', () => {
+      const isOpen = navLinks.classList.toggle('open');
       navToggle.classList.toggle('active');
-      navLinks.classList.toggle('open');
-      document.body.style.overflow = navLinks.classList.contains('open') ? 'hidden' : '';
+      navToggle.setAttribute('aria-expanded', isOpen);
+      document.body.style.overflow = isOpen ? 'hidden' : '';
     });
   }
 
   // Active link tracking
   const sections = document.querySelectorAll('section[id]');
-  const observerOptions = {
-    root: null,
-    rootMargin: '-40% 0px -40% 0px',
-    threshold: 0
-  };
-
   const sectionObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
@@ -66,7 +119,7 @@ function initNavigation() {
         });
       }
     });
-  }, observerOptions);
+  }, { root: null, rootMargin: '-40% 0px -40% 0px', threshold: 0 });
 
   sections.forEach(section => sectionObserver.observe(section));
 
@@ -75,6 +128,7 @@ function initNavigation() {
     link.addEventListener('click', () => {
       if (navLinks && navLinks.classList.contains('open')) {
         navToggle.classList.remove('active');
+        navToggle.setAttribute('aria-expanded', 'false');
         navLinks.classList.remove('open');
         document.body.style.overflow = '';
       }
@@ -84,7 +138,10 @@ function initNavigation() {
 
 /* ---------- Scroll Animations ---------- */
 function initScrollAnimations() {
-  if (prefersReducedMotion) return;
+  if (prefersReducedMotion) {
+    document.querySelectorAll('.fade-up').forEach(el => el.classList.add('visible'));
+    return;
+  }
 
   const fadeElements = document.querySelectorAll('.fade-up');
 
@@ -119,7 +176,7 @@ function initScrollAnimations() {
 
 /* ---------- Image Load States ---------- */
 function initImageLoadStates() {
-  const images = document.querySelectorAll('.vehicle-card img, .hero-img img');
+  const images = document.querySelectorAll('.vehicle-card-image img, .hero-image img, .about-image img');
 
   images.forEach(img => {
     if (img.complete && img.naturalHeight > 0) {
@@ -139,7 +196,8 @@ function initHeroCounters() {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         const target = parseInt(entry.target.dataset.target, 10);
-        animateCounter(entry.target, target);
+        const suffix = entry.target.dataset.suffix || '';
+        animateCounter(entry.target, target, suffix);
         observer.unobserve(entry.target);
       }
     });
@@ -148,9 +206,9 @@ function initHeroCounters() {
   counters.forEach(counter => observer.observe(counter));
 }
 
-function animateCounter(element, target) {
+function animateCounter(element, target, suffix) {
   if (prefersReducedMotion) {
-    element.textContent = target;
+    element.textContent = target + suffix;
     return;
   }
 
@@ -161,7 +219,7 @@ function animateCounter(element, target) {
     const elapsed = currentTime - startTime;
     const progress = Math.min(elapsed / duration, 1);
     const eased = 1 - Math.pow(1 - progress, 3);
-    element.textContent = Math.round(eased * target);
+    element.textContent = Math.round(eased * target) + suffix;
 
     if (progress < 1) {
       requestAnimationFrame(update);
@@ -174,20 +232,32 @@ function animateCounter(element, target) {
 /* ---------- Vehicle Filters ---------- */
 function initVehicleFilters() {
   const filterBtns = document.querySelectorAll('.filter-btn');
-  const cards = document.querySelectorAll('.vehicle-card');
+  const grid = document.getElementById('vehiclesGrid');
 
-  if (!filterBtns.length || !cards.length) return;
+  if (!filterBtns.length || !grid) return;
+
+  // Create empty state element
+  const emptyState = document.createElement('div');
+  emptyState.className = 'vehicles-empty';
+  emptyState.style.display = 'none';
+  const lang = document.documentElement.getAttribute('lang') || 'de';
+  emptyState.innerHTML = `<p>${lang === 'de' ? 'Keine Fahrzeuge in dieser Kategorie gefunden.' : 'No vehicles found in this category.'}</p>`;
+  grid.parentElement.appendChild(emptyState);
 
   filterBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       const filter = btn.dataset.filter;
+      const cards = grid.querySelectorAll('.vehicle-card');
 
       filterBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
 
+      let visibleCount = 0;
+
       cards.forEach(card => {
         const category = card.dataset.category;
         if (filter === 'all' || category === filter) {
+          visibleCount++;
           card.classList.remove('hidden');
           card.style.opacity = '0';
           card.style.transform = 'translateY(16px)';
@@ -202,6 +272,8 @@ function initVehicleFilters() {
           setTimeout(() => card.classList.add('hidden'), 300);
         }
       });
+
+      emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
     });
   });
 }
@@ -219,7 +291,8 @@ function initContactForm() {
     const lang = document.documentElement.getAttribute('lang') || 'de';
 
     if (!data.name || !data.email) {
-      highlightField(form.querySelector('#name'));
+      const emptyField = !data.name ? form.querySelector('#name') : form.querySelector('#email');
+      highlightField(emptyField);
       return;
     }
 
@@ -292,18 +365,50 @@ function highlightField(field) {
 function initSmoothScroll() {
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', (e) => {
+      const href = anchor.getAttribute('href');
+      if (href === '#') return;
       e.preventDefault();
-      const target = document.querySelector(anchor.getAttribute('href'));
+      const target = document.querySelector(href);
       if (!target) return;
 
       const offset = 80;
       const elementPosition = target.getBoundingClientRect().top + window.scrollY;
-      const offsetPosition = elementPosition - offset;
-
       window.scrollTo({
-        top: offsetPosition,
+        top: elementPosition - offset,
         behavior: 'smooth'
       });
     });
+  });
+}
+
+/* ---------- Back to Top Button ---------- */
+function initBackToTop() {
+  const btn = document.getElementById('backToTop');
+  if (!btn) return;
+
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 600) {
+      btn.classList.add('visible');
+    } else {
+      btn.classList.remove('visible');
+    }
+  });
+
+  btn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}
+
+/* ---------- Mobile CTA Bar ---------- */
+function initMobileCTA() {
+  const bar = document.getElementById('mobileCTA');
+  if (!bar) return;
+
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 400) {
+      bar.classList.add('visible');
+    } else {
+      bar.classList.remove('visible');
+    }
   });
 }

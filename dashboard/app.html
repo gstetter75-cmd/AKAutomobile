@@ -50,72 +50,81 @@
   <script src="js/modules/dashboard-home.js"></script>
   <script src="js/modules/vehicles-list.js"></script>
   <script src="js/modules/vehicles-form.js"></script>
+  <script src="js/modules/customers-list.js"></script>
+  <script src="js/modules/customers-form.js"></script>
+  <script src="js/modules/inquiries-list.js"></script>
+  <script src="js/modules/finance-list.js"></script>
+  <script src="js/modules/finance-form.js"></script>
+  <script src="js/modules/appointments-list.js"></script>
+  <script src="js/modules/appointments-form.js"></script>
+  <script src="js/modules/documents-list.js"></script>
+  <script src="js/modules/settings.js"></script>
 
   <!-- App Init -->
   <script>
     (async function initApp() {
-      // Require authentication
       const session = await requireAuth();
       if (!session) return;
 
-      // Render sidebar
       renderSidebar(document.getElementById('sidebar'));
 
-      // Sidebar toggle for mobile
       document.getElementById('sidebarToggle').addEventListener('click', () => {
         document.getElementById('sidebar').classList.toggle('open');
       });
 
-      // Show user email
       const user = await getUser();
       document.getElementById('headerUser').textContent = user?.email || '';
 
-      // Register routes
+      // Register all routes
       router.register('/dashboard', renderDashboardHome);
       router.register('/vehicles', renderVehiclesList);
       router.register('/vehicles/new', (c) => renderVehicleForm(c, null));
+      router.register('/customers', renderCustomersList);
+      router.register('/customers/new', (c) => renderCustomerForm(c, null));
+      router.register('/inquiries', renderInquiriesList);
+      router.register('/finance', renderFinanceList);
+      router.register('/finance/new', (c) => renderFinanceForm(c, null));
+      router.register('/documents', renderDocumentsList);
+      router.register('/appointments', renderAppointmentsList);
+      router.register('/appointments/new', renderAppointmentForm);
+      router.register('/settings', renderSettings);
 
-      // Dynamic edit route
+      // Dynamic edit routes
       const origHandle = router.handleRoute.bind(router);
       router.handleRoute = async function() {
         const hash = window.location.hash.slice(1) || '/dashboard';
+        const content = document.getElementById('appContent');
 
         // Match /vehicles/edit/:id
-        const editMatch = hash.match(/^\/vehicles\/edit\/(.+)$/);
-        if (editMatch) {
-          const content = document.getElementById('appContent');
+        const vehicleEdit = hash.match(/^\/vehicles\/edit\/(.+)$/);
+        if (vehicleEdit) {
           content.innerHTML = '<div class="loading-spinner"></div>';
           document.querySelectorAll('.sidebar-link').forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#/vehicles'));
-          await renderVehicleForm(content, editMatch[1]);
+          await renderVehicleForm(content, vehicleEdit[1]);
+          return;
+        }
+
+        // Match /customers/edit/:id
+        const customerEdit = hash.match(/^\/customers\/edit\/(.+)$/);
+        if (customerEdit) {
+          content.innerHTML = '<div class="loading-spinner"></div>';
+          document.querySelectorAll('.sidebar-link').forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#/customers'));
+          await renderCustomerForm(content, customerEdit[1]);
+          return;
+        }
+
+        // Match /finance/edit/:id
+        const financeEdit = hash.match(/^\/finance\/edit\/(.+)$/);
+        if (financeEdit) {
+          content.innerHTML = '<div class="loading-spinner"></div>';
+          document.querySelectorAll('.sidebar-link').forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#/finance'));
+          await renderFinanceForm(content, financeEdit[1]);
           return;
         }
 
         await origHandle();
       };
 
-      // Placeholder routes for modules not yet built
-      const placeholderModule = (name, icon) => (container) => {
-        container.innerHTML = `
-          <div class="page-header"><h1>${name}</h1></div>
-          <div class="card"><div class="card-body" style="text-align:center; padding: 60px;">
-            <span style="font-size: 3rem;">${icon}</span>
-            <h2 style="margin: 16px 0 8px;">Kommt bald</h2>
-            <p class="text-muted">Dieses Modul wird in der nächsten Phase implementiert.</p>
-          </div></div>
-        `;
-      };
-
-      router.register('/customers', placeholderModule('Kunden', '👥'));
-      router.register('/customers/new', placeholderModule('Neuer Kunde', '👤'));
-      router.register('/inquiries', placeholderModule('Anfragen', '📧'));
-      router.register('/finance', placeholderModule('Finanzen', '💰'));
-      router.register('/finance/new', placeholderModule('Neue Buchung', '💰'));
-      router.register('/documents', placeholderModule('Dokumente', '📄'));
-      router.register('/appointments', placeholderModule('Termine', '📅'));
-      router.register('/appointments/new', placeholderModule('Neuer Termin', '📅'));
-      router.register('/settings', placeholderModule('Einstellungen', '⚙️'));
-
-      // Start router
       router.init();
     })();
   </script>

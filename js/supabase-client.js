@@ -13,7 +13,7 @@ async function loadVehiclesFromSupabase() {
     const { data, error } = await sb
       .from('vehicles')
       .select('*')
-      .eq('status', 'available')
+      .in('status', ['available', 'reserved'])
       .order('created_at', { ascending: false });
 
     if (error) throw error;
@@ -32,7 +32,8 @@ async function loadVehiclesFromSupabase() {
         mileage: new Intl.NumberFormat('de-DE').format(v.mileage) + ' km',
         category: v.category,
         fuel: v.fuel,
-        badge: v.badge || null,
+        badge: v.status === 'reserved' ? 'Reserviert' : (v.badge || null),
+        reserved: v.status === 'reserved',
         images: [
           `https://images.pexels.com/photos/1592384/pexels-photo-1592384.jpeg?auto=compress&cs=tinysrgb&w=800`,
           `https://images.pexels.com/photos/1592384/pexels-photo-1592384.jpeg?auto=compress&cs=tinysrgb&w=400`

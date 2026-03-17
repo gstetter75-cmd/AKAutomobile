@@ -77,6 +77,14 @@ async function renderSettings(container) {
           </div>
         </div>
 
+        <h3 class="form-section-title">Benachrichtigungen</h3>
+        <div class="info-banner" style="margin-bottom: 16px;">
+          📧 E-Mail-Benachrichtigungen bei neuen Anfragen können über das
+          <a href="https://supabase.com/dashboard/project/bwunbletmseulnfgtljn/database/hooks" target="_blank">Supabase Dashboard → Database Webhooks</a>
+          eingerichtet werden. Verbinde die <code>inquiries</code>-Tabelle mit einem E-Mail-Dienst wie
+          <a href="https://resend.com" target="_blank">Resend</a> (kostenlos bis 3.000 E-Mails/Monat).
+        </div>
+
         <h3 class="form-section-title">Website</h3>
         <div class="form-grid-2">
           <div class="form-group">
@@ -99,6 +107,42 @@ async function renderSettings(container) {
         <button type="submit" class="btn btn-primary">Einstellungen speichern</button>
       </div>
     </form>
+
+    <div class="card" style="margin-bottom: 24px;">
+      <div class="card-body">
+        <h3 class="form-section-title" style="margin-top: 0;">Tipps & nächste Schritte</h3>
+        <div class="tips-grid">
+          <div class="tip-item">
+            <span class="tip-icon">🌐</span>
+            <div>
+              <strong>Custom Domain</strong>
+              <p class="text-muted">Eigene Domain (z.B. ak-automobile.de) statt GitHub Pages. Unter <a href="https://github.com/gstetter75-cmd/AKAutomobile/settings/pages" target="_blank">Repo Settings → Pages</a> konfigurierbar.</p>
+            </div>
+          </div>
+          <div class="tip-item">
+            <span class="tip-icon">📱</span>
+            <div>
+              <strong>Dashboard als App</strong>
+              <p class="text-muted">Öffne das Dashboard auf dem Handy und tippe "Zum Startbildschirm hinzufügen" — es verhält sich dann wie eine App.</p>
+            </div>
+          </div>
+          <div class="tip-item">
+            <span class="tip-icon">📊</span>
+            <div>
+              <strong>Website-Analytics</strong>
+              <p class="text-muted">Für Besucherstatistiken: <a href="https://plausible.io" target="_blank">Plausible.io</a> (DSGVO-konform, ab 9€/Monat). Script ist vorbereitet in index.html.</p>
+            </div>
+          </div>
+          <div class="tip-item">
+            <span class="tip-icon">📍</span>
+            <div>
+              <strong>Google My Business</strong>
+              <p class="text-muted">Erstelle ein <a href="https://business.google.com" target="_blank">Google Business Profil</a> — Kunden finden dich dann auf Google Maps.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   `;
 
   container.querySelector('#settingsForm').addEventListener('submit', async (e) => {

@@ -1,0 +1,16 @@
+{
+  "name": "AK Automobile Dashboard",
+  "short_name": "AK Dashboard",
+  "description": "Fahrzeugverwaltung, CRM und Büro für AK Automobile",
+  "start_url": "./app.html",
+  "display": "standalone",
+  "background_color": "#112840",
+  "theme_color": "#1B3A5C",
+  "icons": [
+    {
+      "src": "favicon-admin.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

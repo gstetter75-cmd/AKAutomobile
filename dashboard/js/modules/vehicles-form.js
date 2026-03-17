@@ -123,6 +123,16 @@ async function renderVehicleForm(container, vehicleId) {
           </div>
         </div>
 
+        <h3 class="form-section-title">Bilder</h3>
+        <div id="imageUploadArea" class="image-upload-area">
+          <div class="image-upload-zone" id="dropZone">
+            <p>📷 Bilder hierher ziehen oder <label for="fileInput" class="upload-link">Dateien auswählen</label></p>
+            <input type="file" id="fileInput" multiple accept="image/jpeg,image/png,image/webp" style="display:none;">
+            <p class="text-muted" style="font-size:0.8rem;">Max. 5 MB pro Bild · JPEG, PNG, WebP</p>
+          </div>
+          <div class="image-preview-grid" id="imagePreviewGrid"></div>
+        </div>
+
         <h3 class="form-section-title">Beschreibung</h3>
         <div class="form-grid-2">
           <div class="form-group">
@@ -142,6 +152,71 @@ async function renderVehicleForm(container, vehicleId) {
       </div>
     </form>
   `;
+
+  // --- Image Upload ---
+  const dropZone = container.querySelector('#dropZone');
+  const fileInput = container.querySelector('#fileInput');
+  const previewGrid = container.querySelector('#imagePreviewGrid');
+  let uploadedImages = [];
+
+  // Load existing images for edit mode
+  if (isEdit) {
+    try {
+      const existingImages = await api.fetchAll('vehicle_images', { filters: { vehicle_id: vehicleId }, orderBy: 'position' });
+      uploadedImages = existingImages.map(img => ({ id: img.id, url: img.url, storage_path: img.storage_path, existing: true }));
+      renderImagePreviews();
+    } catch (e) { /* no images yet */ }
+  }
+
+  function renderImagePreviews() {
+    previewGrid.innerHTML = uploadedImages.map((img, i) => `
+      <div class="image-preview-item" data-index="${i}">
+        <img src="${img.url}" alt="Bild ${i + 1}">
+        <button type="button" class="image-preview-remove" data-index="${i}">&times;</button>
+        ${i === 0 ? '<span class="image-preview-primary">Hauptbild</span>' : ''}
+      </div>
+    `).join('');
+
+    previewGrid.querySelectorAll('.image-preview-remove').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const idx = parseInt(btn.dataset.index);
+        const img = uploadedImages[idx];
+        if (img.existing && img.id) {
+          try {
+            if (img.storage_path) await supabaseClient.storage.from('vehicle-images').remove([img.storage_path]);
+            await api.remove('vehicle_images', img.id);
+          } catch (e) { /* continue */ }
+        } else if (img.storage_path) {
+          await supabaseClient.storage.from('vehicle-images').remove([img.storage_path]);
+        }
+        uploadedImages.splice(idx, 1);
+        renderImagePreviews();
+      });
+    });
+  }
+
+  async function handleFiles(files) {
+    for (const file of files) {
+      if (file.size > 5 * 1024 * 1024) { toast.error(`${file.name} ist zu groß (max 5 MB)`); continue; }
+      if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) { toast.error(`${file.name}: Format nicht unterstützt`); continue; }
+
+      const path = `vehicles/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+      try {
+        const { error } = await supabaseClient.storage.from('vehicle-images').upload(path, file);
+        if (error) throw error;
+        const { data: { publicUrl } } = supabaseClient.storage.from('vehicle-images').getPublicUrl(path);
+        uploadedImages.push({ url: publicUrl, storage_path: path, existing: false });
+        renderImagePreviews();
+        toast.success(`${file.name} hochgeladen`);
+      } catch (err) { toast.error(`Upload fehlgeschlagen: ${err.message}`); }
+    }
+  }
+
+  dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+  dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('dragover'); handleFiles(e.dataTransfer.files); });
+  fileInput.addEventListener('change', () => { handleFiles(fileInput.files); fileInput.value = ''; });
+  dropZone.querySelector('.upload-link').addEventListener('click', (e) => { e.preventDefault(); fileInput.click(); });
 
   // Auto-generate name from brand + model
   const brandInput = container.querySelector('#vBrand');
@@ -190,15 +265,31 @@ async function renderVehicleForm(container, vehicleId) {
     }
 
     try {
+      let savedId;
       if (isEdit) {
         await api.update('vehicles', vehicleId, data);
+        savedId = vehicleId;
         await api.logActivity('vehicle_updated', 'vehicle', vehicleId, `Fahrzeug aktualisiert: ${data.name}`);
         toast.success('Fahrzeug gespeichert');
       } else {
         const created = await api.insert('vehicles', data);
+        savedId = created.id;
         await api.logActivity('vehicle_created', 'vehicle', created.id, `Neues Fahrzeug: ${data.name}`);
         toast.success('Fahrzeug angelegt');
       }
+
+      // Save new uploaded images to vehicle_images table
+      const newImages = uploadedImages.filter(img => !img.existing);
+      for (let i = 0; i < newImages.length; i++) {
+        await api.insert('vehicle_images', {
+          vehicle_id: savedId,
+          url: newImages[i].url,
+          storage_path: newImages[i].storage_path,
+          position: uploadedImages.indexOf(newImages[i]),
+          is_primary: uploadedImages.indexOf(newImages[i]) === 0
+        });
+      }
+
       router.navigate('/vehicles');
     } catch (err) {
       toast.error('Fehler: ' + err.message);

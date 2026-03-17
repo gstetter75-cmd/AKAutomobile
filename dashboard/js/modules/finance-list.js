@@ -133,6 +133,7 @@ function renderTransactionRows(transactions) {
       <td>
         <div class="table-actions">
           <button class="btn-icon btn-edit" data-id="${t.id}" title="Bearbeiten">✏️</button>
+          ${t.type === 'income' ? `<button class="btn-icon btn-invoice" data-id="${t.id}" title="Rechnung PDF">🧾</button>` : ''}
           <button class="btn-icon btn-delete" data-id="${t.id}" title="Löschen">🗑️</button>
         </div>
       </td>
@@ -143,6 +144,23 @@ function renderTransactionRows(transactions) {
 function attachFinanceActions(container) {
   container.querySelectorAll('.btn-edit').forEach(btn => {
     btn.addEventListener('click', () => router.navigate('/finance/edit/' + btn.dataset.id));
+  });
+
+  container.querySelectorAll('.btn-invoice').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      try {
+        const t = await api.fetchById('transactions', btn.dataset.id);
+        const customer = t.customer_id ? await api.fetchById('customers', t.customer_id) : null;
+        const vehicle = t.vehicle_id ? await api.fetchById('vehicles', t.vehicle_id) : null;
+        await generateInvoicePDF({
+          customer, vehicle,
+          amount: t.amount,
+          taxType: t.tax_type,
+          invoiceNumber: t.invoice_number,
+          date: formatDate(t.date)
+        });
+      } catch (err) { toast.error('Fehler: ' + err.message); }
+    });
   });
   container.querySelectorAll('.btn-delete').forEach(btn => {
     btn.addEventListener('click', async () => {

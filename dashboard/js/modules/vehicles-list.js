@@ -102,6 +102,8 @@ function renderVehicleRows(vehicles) {
       <td>
         <div class="table-actions">
           <button class="btn-icon btn-edit" data-id="${v.id}" title="Bearbeiten">✏️</button>
+          <button class="btn-icon btn-expose" data-id="${v.id}" title="PDF-Exposé">📄</button>
+          <button class="btn-icon btn-contract" data-id="${v.id}" title="Kaufvertrag">📝</button>
           <button class="btn-icon btn-delete" data-id="${v.id}" title="Löschen">🗑️</button>
         </div>
       </td>
@@ -112,6 +114,17 @@ function renderVehicleRows(vehicles) {
 function attachVehicleActions(container) {
   container.querySelectorAll('.btn-edit').forEach(btn => {
     btn.addEventListener('click', () => router.navigate('/vehicles/edit/' + btn.dataset.id));
+  });
+
+  container.querySelectorAll('.btn-expose').forEach(btn => {
+    btn.addEventListener('click', () => exportVehicleExpose(btn.dataset.id));
+  });
+
+  container.querySelectorAll('.btn-contract').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const vehicle = await api.fetchById('vehicles', btn.dataset.id);
+      generateContractPDF({ customer: null, vehicle, price: vehicle.price });
+    });
   });
 
   container.querySelectorAll('.btn-delete').forEach(btn => {

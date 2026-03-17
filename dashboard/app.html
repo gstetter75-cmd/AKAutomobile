@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AK Automobile — Dashboard</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar"></aside>
+
+    <!-- Main Content -->
+    <main class="app-main">
+      <header class="app-header" id="appHeader">
+        <button class="sidebar-toggle" id="sidebarToggle" aria-label="Menü">
+          <span></span><span></span><span></span>
+        </button>
+        <div class="app-header-title" id="headerTitle">Dashboard</div>
+        <div class="app-header-user" id="headerUser"></div>
+      </header>
+      <div class="app-content" id="appContent">
+        <div class="loading-spinner"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Config & Core -->
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/router.js"></script>
+
+  <!-- Components -->
+  <script src="js/components/sidebar.js"></script>
+  <script src="js/components/toast.js"></script>
+  <script src="js/components/modal.js"></script>
+
+  <!-- Modules -->
+  <script src="js/modules/dashboard-home.js"></script>
+  <script src="js/modules/vehicles-list.js"></script>
+  <script src="js/modules/vehicles-form.js"></script>
+
+  <!-- App Init -->
+  <script>
+    (async function initApp() {
+      // Require authentication
+      const session = await requireAuth();
+      if (!session) return;
+
+      // Render sidebar
+      renderSidebar(document.getElementById('sidebar'));
+
+      // Sidebar toggle for mobile
+      document.getElementById('sidebarToggle').addEventListener('click', () => {
+        document.getElementById('sidebar').classList.toggle('open');
+      });
+
+      // Show user email
+      const user = await getUser();
+      document.getElementById('headerUser').textContent = user?.email || '';
+
+      // Register routes
+      router.register('/dashboard', renderDashboardHome);
+      router.register('/vehicles', renderVehiclesList);
+      router.register('/vehicles/new', (c) => renderVehicleForm(c, null));
+
+      // Dynamic edit route
+      const origHandle = router.handleRoute.bind(router);
+      router.handleRoute = async function() {
+        const hash = window.location.hash.slice(1) || '/dashboard';
+
+        // Match /vehicles/edit/:id
+        const editMatch = hash.match(/^\/vehicles\/edit\/(.+)$/);
+        if (editMatch) {
+          const content = document.getElementById('appContent');
+          content.innerHTML = '<div class="loading-spinner"></div>';
+          document.querySelectorAll('.sidebar-link').forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#/vehicles'));
+          await renderVehicleForm(content, editMatch[1]);
+          return;
+        }
+
+        await origHandle();
+      };
+
+      // Placeholder routes for modules not yet built
+      const placeholderModule = (name, icon) => (container) => {
+        container.innerHTML = `
+          <div class="page-header"><h1>${name}</h1></div>
+          <div class="card"><div class="card-body" style="text-align:center; padding: 60px;">
+            <span style="font-size: 3rem;">${icon}</span>
+            <h2 style="margin: 16px 0 8px;">Kommt bald</h2>
+            <p class="text-muted">Dieses Modul wird in der nächsten Phase implementiert.</p>
+          </div></div>
+        `;
+      };
+
+      router.register('/customers', placeholderModule('Kunden', '👥'));
+      router.register('/customers/new', placeholderModule('Neuer Kunde', '👤'));
+      router.register('/inquiries', placeholderModule('Anfragen', '📧'));
+      router.register('/finance', placeholderModule('Finanzen', '💰'));
+      router.register('/finance/new', placeholderModule('Neue Buchung', '💰'));
+      router.register('/documents', placeholderModule('Dokumente', '📄'));
+      router.register('/appointments', placeholderModule('Termine', '📅'));
+      router.register('/appointments/new', placeholderModule('Neuer Termin', '📅'));
+      router.register('/settings', placeholderModule('Einstellungen', '⚙️'));
+
+      // Start router
+      router.init();
+    })();
+  </script>
+</body>
+</html>

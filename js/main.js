@@ -5,7 +5,12 @@
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  // Try loading vehicles from Supabase, fallback to static data
+  if (typeof loadVehiclesFromSupabase === 'function') {
+    await loadVehiclesFromSupabase();
+  }
+
   // Cards MUST be rendered first — other inits depend on them
   initVehicleCards();
   initNavigation();
@@ -308,13 +313,32 @@ function initContactForm() {
     submitBtn.style.opacity = '0.6';
 
     try {
-      const response = await fetch(form.action, {
-        method: 'POST',
-        body: formData,
-        headers: { 'Accept': 'application/json' }
-      });
+      // Try Supabase first, fallback to Formspree
+      let success = false;
 
-      if (response.ok) {
+      if (typeof window.supabase !== 'undefined') {
+        const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const { error } = await sb.from('inquiries').insert({
+          name: data.name,
+          email: data.email,
+          phone: data.phone || null,
+          subject: data.subject || null,
+          vehicle_id: (data.vehicle && data.vehicle !== 'other' && data.vehicle !== '') ? data.vehicle : null,
+          message: data.message || null
+        });
+        success = !error;
+      }
+
+      if (!success) {
+        const response = await fetch(form.action, {
+          method: 'POST',
+          body: formData,
+          headers: { 'Accept': 'application/json' }
+        });
+        success = response.ok;
+      }
+
+      if (success) {
         submitBtn.textContent = lang === 'de' ? 'Nachricht gesendet!' : 'Message Sent!';
         submitBtn.style.background = 'var(--green)';
         form.reset();

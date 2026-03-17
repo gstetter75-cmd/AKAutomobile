@@ -12,6 +12,9 @@ function renderSidebar(container) {
     { path: '/documents', icon: '📄', label: 'Dokumente' },
     { path: '/appointments', icon: '📅', label: 'Termine' },
     { divider: true },
+    { path: '/exports', icon: '📥', label: 'Exporte' },
+    { path: '/portals', icon: '🌐', label: 'Portale' },
+    { divider: true },
     { path: '/settings', icon: '⚙️', label: 'Einstellungen' }
   ];
 
@@ -33,6 +36,10 @@ function renderSidebar(container) {
       }).join('')}
     </nav>
     <div class="sidebar-footer">
+      <a href="../index.html" target="_blank" class="sidebar-link sidebar-website-link">
+        <span class="sidebar-icon">🔗</span>
+        <span class="sidebar-label">Website ansehen</span>
+      </a>
       <button class="sidebar-logout" id="logoutBtn">
         <span class="sidebar-icon">🚪</span>
         <span class="sidebar-label">Abmelden</span>

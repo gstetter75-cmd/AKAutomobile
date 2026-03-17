@@ -1,17 +1,27 @@
 /* ==========================================================================
-   Settings Module — Company Data
+   Settings Module — Company Data + Website Preview
    ========================================================================== */
 
 async function renderSettings(container) {
-  const settings = await api.fetchAll('settings', { limit: 1 });
+  let settings;
+  try {
+    const result = await api.fetchAll('settings', { limit: 1 });
+    settings = result;
+  } catch (err) {
+    settings = [];
+  }
   const s = settings[0] || {};
 
   container.innerHTML = `
     <div class="page-header">
-      <h1>Einstellungen</h1>
+      <div>
+        <h1>Einstellungen</h1>
+        <p class="page-subtitle">Firmendaten und Konfiguration</p>
+      </div>
+      <a href="../index.html" target="_blank" class="btn btn-outline">🔗 Website ansehen</a>
     </div>
 
-    <form id="settingsForm" class="card">
+    <form id="settingsForm" class="card" style="margin-bottom: 24px;">
       <div class="card-body">
         <h3 class="form-section-title">Firmendaten</h3>
         <div class="form-grid-2">
@@ -66,6 +76,24 @@ async function renderSettings(container) {
             <input type="number" name="invoice_counter" class="form-input" value="${s.invoice_counter || 1}" min="1">
           </div>
         </div>
+
+        <h3 class="form-section-title">Website</h3>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Website-URL</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" class="form-input" value="https://gstetter75-cmd.github.io/AKAutomobile/" readonly style="background: var(--gray-100);">
+              <a href="https://gstetter75-cmd.github.io/AKAutomobile/" target="_blank" class="btn btn-outline" style="white-space: nowrap;">Öffnen</a>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Supabase-Projekt</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" class="form-input" value="bwunbletmseulnfgtljn (eu-central-1)" readonly style="background: var(--gray-100);">
+              <a href="https://supabase.com/dashboard/project/bwunbletmseulnfgtljn" target="_blank" class="btn btn-outline" style="white-space: nowrap;">Öffnen</a>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="card-footer">
         <button type="submit" class="btn btn-primary">Einstellungen speichern</button>
@@ -91,7 +119,9 @@ async function renderSettings(container) {
 
     try {
       if (s.id) {
-        await api.update('settings', s.id, data);
+        // Settings table has no updated_at — use direct update
+        const { error } = await supabaseClient.from('settings').update(data).eq('id', s.id);
+        if (error) throw error;
       } else {
         await api.insert('settings', data);
       }

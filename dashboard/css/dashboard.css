@@ -139,7 +139,28 @@ body { font-family: var(--font); background: var(--gray-50); color: var(--gray-8
 }
 
 .app-header-title { font-weight: 700; font-size: 1rem; color: var(--gray-800); }
-.app-header-user { margin-left: auto; font-size: 0.85rem; color: var(--gray-500); }
+.app-header-website-btn {
+  margin-left: auto;
+  padding: 6px 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--gray-100);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: background 0.15s;
+}
+.app-header-website-btn:hover { background: var(--gray-200); color: var(--primary); }
+.app-header-user { font-size: 0.85rem; color: var(--gray-500); }
+
+.sidebar-website-link {
+  color: rgba(255,255,255,0.5) !important;
+  margin-bottom: 4px;
+}
+.sidebar-website-link:hover {
+  color: var(--white) !important;
+  background: rgba(255,255,255,0.06);
+}
 
 .sidebar-toggle { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
 .sidebar-toggle span { display: block; width: 20px; height: 2px; background: var(--gray-700); margin: 4px 0; border-radius: 1px; }

@@ -23,6 +23,17 @@ async function renderDashboardHome(container) {
     .select('amount')
     .eq('type', 'income')
     .gte('date', firstOfMonth.toISOString().split('T')[0]);
+
+  // Tomorrow's appointments for reminders
+  const tomorrow = new Date(Date.now() + 86400000);
+  const tomorrowStr = tomorrow.toISOString().split('T')[0];
+  const dayAfter = new Date(Date.now() + 2 * 86400000).toISOString().split('T')[0];
+  const { data: tomorrowAppts } = await supabaseClient.from('appointments')
+    .select('*')
+    .eq('status', 'scheduled')
+    .gte('start_time', tomorrowStr)
+    .lt('start_time', dayAfter)
+    .order('start_time');
   const monthRevenue = (monthIncome || []).reduce((sum, t) => sum + parseFloat(t.amount), 0);
 
   container.innerHTML = `
@@ -62,6 +73,22 @@ async function renderDashboardHome(container) {
       </div>
     </div>
 
+    ${(tomorrowAppts && tomorrowAppts.length > 0) ? `
+    <div class="card" style="margin-bottom: 20px; border-left: 4px solid var(--orange);">
+      <div class="card-body">
+        <h3 style="margin-bottom: 12px;">⏰ Erinnerung: ${tomorrowAppts.length} Termin${tomorrowAppts.length > 1 ? 'e' : ''} morgen</h3>
+        ${tomorrowAppts.map(a => {
+          const time = new Date(a.start_time).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+          const typeInfo = appointmentTypeMap[a.type] || { icon: '📌', label: a.type };
+          return `<div style="display:flex;gap:8px;align-items:center;padding:6px 0;">
+            <span>${typeInfo.icon}</span>
+            <strong>${time}</strong>
+            <span>${escapeHtml(a.title)}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>` : ''}
+
     <div class="dash-grid-2">
       <div class="card">
         <div class="card-header">
@@ -73,6 +100,7 @@ async function renderDashboardHome(container) {
           <a href="#/inquiries" class="quick-action-btn">📧 Anfragen anzeigen</a>
           <a href="#/appointments/new" class="quick-action-btn">📅 Termin planen</a>
           <a href="#/finance/new" class="quick-action-btn">💰 Buchung erfassen</a>
+          <a href="../index.html" target="_blank" class="quick-action-btn">🔗 Website ansehen</a>
         </div>
       </div>
 

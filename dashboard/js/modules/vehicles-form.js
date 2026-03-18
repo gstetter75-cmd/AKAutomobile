@@ -91,6 +91,19 @@ async function renderVehicleForm(container, vehicleId) {
           </div>
         </div>
 
+        <div class="form-grid-3">
+          <div class="form-group">
+            <label class="form-label" for="vPurchasePrice">Einkaufspreis (€) <span class="text-muted">intern</span></label>
+            <input type="number" id="vPurchasePrice" name="purchase_price" class="form-input" value="${v.purchase_price || ''}" min="0" step="100" placeholder="Nur für Margenberechnung">
+          </div>
+          <div class="form-group" id="marginDisplay" style="display:flex;align-items:flex-end;">
+            <div class="margin-info">
+              <span class="form-label">Marge</span>
+              <div id="marginValue" class="margin-value">—</div>
+            </div>
+          </div>
+        </div>
+
         <h3 class="form-section-title">Technische Daten</h3>
         <div class="form-grid-3">
           <div class="form-group">
@@ -233,6 +246,28 @@ async function renderVehicleForm(container, vehicleId) {
   brandInput.addEventListener('input', autoName);
   modelInput.addEventListener('input', autoName);
 
+  // Margin calculation
+  const priceInput = container.querySelector('#vPrice');
+  const purchasePriceInput = container.querySelector('#vPurchasePrice');
+  const marginValue = container.querySelector('#marginValue');
+
+  function updateMargin() {
+    const sell = parseInt(priceInput?.value) || 0;
+    const buy = parseInt(purchasePriceInput?.value) || 0;
+    if (sell && buy) {
+      const margin = sell - buy;
+      const pct = ((margin / buy) * 100).toFixed(0);
+      marginValue.textContent = `${formatPrice(margin)} (${pct}%)`;
+      marginValue.style.color = margin >= 0 ? 'var(--green)' : 'var(--red)';
+    } else {
+      marginValue.textContent = '—';
+      marginValue.style.color = '';
+    }
+  }
+  priceInput?.addEventListener('input', updateMargin);
+  purchasePriceInput?.addEventListener('input', updateMargin);
+  updateMargin();
+
   // Submit
   container.querySelector('#vehicleForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -255,7 +290,8 @@ async function renderVehicleForm(container, vehicleId) {
       top_speed: form.top_speed.value.trim() || null,
       acceleration: form.acceleration.value.trim() || null,
       description_de: form.description_de.value.trim() || null,
-      description_en: form.description_en.value.trim() || null
+      description_en: form.description_en.value.trim() || null,
+      purchase_price: form.purchase_price.value ? parseInt(form.purchase_price.value) : 0
     };
 
     const missing = validateRequired(data, ['brand', 'model', 'name', 'year', 'price', 'mileage', 'category', 'fuel']);

@@ -41,6 +41,7 @@ async function renderVehiclesList(container) {
               <th>Preis</th>
               <th>Km-Stand</th>
               <th>Baujahr</th>
+              <th>Marge</th>
               <th>Status</th>
               <th>Aktionen</th>
             </tr>
@@ -83,7 +84,7 @@ async function renderVehiclesList(container) {
 
 function renderVehicleRows(vehicles) {
   if (vehicles.length === 0) {
-    return '<tr><td colspan="7" class="text-center text-muted">Keine Fahrzeuge gefunden</td></tr>';
+    return '<tr><td colspan="8" class="text-center text-muted">Keine Fahrzeuge gefunden</td></tr>';
   }
 
   return vehicles.map(v => `
@@ -98,10 +99,12 @@ function renderVehicleRows(vehicles) {
       <td><strong>${formatPrice(v.price)}</strong></td>
       <td>${formatMileage(v.mileage)}</td>
       <td>${v.year}</td>
+      <td>${v.purchase_price ? `<span style="color:${v.price - v.purchase_price >= 0 ? 'var(--green)' : 'var(--red)'};font-weight:600;">${formatPrice(v.price - v.purchase_price)}</span>` : '<span class="text-muted">—</span>'}</td>
       <td>${statusBadge(v.status, vehicleStatusMap)}</td>
       <td>
         <div class="table-actions">
           <button class="btn-icon btn-edit" data-id="${v.id}" title="Bearbeiten">✏️</button>
+          ${v.status === 'available' ? `<button class="btn-icon btn-sell" data-id="${v.id}" title="Verkaufen">💰</button>` : ''}
           <button class="btn-icon btn-expose" data-id="${v.id}" title="PDF-Exposé">📄</button>
           <button class="btn-icon btn-contract" data-id="${v.id}" title="Kaufvertrag">📝</button>
           <button class="btn-icon btn-delete" data-id="${v.id}" title="Löschen">🗑️</button>
@@ -114,6 +117,10 @@ function renderVehicleRows(vehicles) {
 function attachVehicleActions(container) {
   container.querySelectorAll('.btn-edit').forEach(btn => {
     btn.addEventListener('click', () => router.navigate('/vehicles/edit/' + btn.dataset.id));
+  });
+
+  container.querySelectorAll('.btn-sell').forEach(btn => {
+    btn.addEventListener('click', () => openSellWorkflow(btn.dataset.id));
   });
 
   container.querySelectorAll('.btn-expose').forEach(btn => {

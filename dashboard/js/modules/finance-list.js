@@ -16,6 +16,7 @@ async function renderFinanceList(container) {
         <p class="page-subtitle">${transactions.length} Buchungen</p>
       </div>
       <div style="display: flex; gap: 8px;">
+        <a href="#/finance/charts" class="btn btn-outline">📊 Diagramme</a>
         <button class="btn btn-outline" id="exportCsvBtn">📥 CSV-Export</button>
         <a href="#/finance/new" class="btn btn-primary">+ Neue Buchung</a>
       </div>

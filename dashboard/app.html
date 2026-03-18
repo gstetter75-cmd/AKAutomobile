@@ -40,6 +40,8 @@
   <!-- jsPDF for PDF exports -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+  <!-- Chart.js for finance charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 
   <!-- Config & Core -->
   <script src="js/config.js"></script>
@@ -66,6 +68,8 @@
   <script src="js/modules/appointments-form.js"></script>
   <script src="js/modules/documents-list.js"></script>
   <script src="js/modules/pdf-templates.js"></script>
+  <script src="js/modules/sell-workflow.js"></script>
+  <script src="js/modules/finance-charts.js"></script>
   <script src="js/modules/exports.js"></script>
   <script src="js/modules/portals.js"></script>
   <script src="js/modules/settings.js"></script>
@@ -93,6 +97,7 @@
       router.register('/customers/new', (c) => renderCustomerForm(c, null));
       router.register('/inquiries', renderInquiriesList);
       router.register('/finance', renderFinanceList);
+      router.register('/finance/charts', renderFinanceCharts);
       router.register('/finance/new', (c) => renderFinanceForm(c, null));
       router.register('/documents', renderDocumentsList);
       router.register('/appointments', renderAppointmentsList);

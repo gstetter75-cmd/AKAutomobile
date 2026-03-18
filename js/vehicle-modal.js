@@ -117,12 +117,45 @@ function initVehicleModal() {
               `).join('')}
             </div>
           </div>
+          <div class="modal-finance" style="background:var(--gray-50);padding:12px 16px;border-radius:8px;margin-top:16px;">
+            <div style="font-size:0.85rem;font-weight:600;color:var(--gray-700);margin-bottom:8px;">
+              ${lang === 'de' ? '💳 Finanzierungsrechner' : '💳 Finance Calculator'}
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <label style="font-size:0.82rem;color:var(--gray-600);">${lang === 'de' ? 'Laufzeit:' : 'Term:'}</label>
+              <select id="financeMonths" style="padding:6px 10px;border:1px solid var(--gray-300);border-radius:6px;font-size:0.85rem;">
+                <option value="24">24 ${lang === 'de' ? 'Monate' : 'months'}</option>
+                <option value="36">36 ${lang === 'de' ? 'Monate' : 'months'}</option>
+                <option value="48" selected>48 ${lang === 'de' ? 'Monate' : 'months'}</option>
+                <option value="60">60 ${lang === 'de' ? 'Monate' : 'months'}</option>
+                <option value="72">72 ${lang === 'de' ? 'Monate' : 'months'}</option>
+              </select>
+              <span style="font-size:1.1rem;font-weight:800;color:var(--primary);" id="monthlyRate"></span>
+              <span style="font-size:0.78rem;color:var(--gray-500);">${lang === 'de' ? '/ Monat*' : '/ month*'}</span>
+            </div>
+            <div style="font-size:0.72rem;color:var(--gray-400);margin-top:4px;">
+              *${lang === 'de' ? 'Beispielrechnung bei 4,99% eff. Jahreszins. Keine verbindliche Zusage.' : 'Example at 4.99% APR. Not a binding offer.'}
+            </div>
+          </div>
           <div class="modal-footer">
             <a href="#contact" class="btn btn-primary modal-cta" id="modalContactBtn">${contactText}</a>
           </div>
         </div>
       </div>
     `;
+
+    // Finance calculator
+    function calcMonthlyRate() {
+      const months = parseInt(document.getElementById('financeMonths')?.value || 48);
+      const rate = 0.0499;
+      const monthlyRate = rate / 12;
+      const price = vehicle.price;
+      const monthly = (price * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -months));
+      const rateEl = document.getElementById('monthlyRate');
+      if (rateEl) rateEl.textContent = `ab ${new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(monthly)}`;
+    }
+    calcMonthlyRate();
+    document.getElementById('financeMonths')?.addEventListener('change', calcMonthlyRate);
 
     // Gallery thumbnail click handlers
     modalBody.querySelectorAll('.modal-thumb').forEach(thumb => {

@@ -246,3 +246,191 @@ async function generateContractPDF({ customer, vehicle, price }) {
   doc.save(`Kaufvertrag_${safeName}.pdf`);
   toast.success('Kaufvertrag als PDF erstellt');
 }
+
+/* ---------- #9 Test Drive Protocol ---------- */
+async function generateTestDriveProtocol({ customer, vehicle }) {
+  const settingsArr = await api.fetchAll('settings', { limit: 1 });
+  const s = settingsArr[0] || {};
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const today = new Date().toLocaleDateString('de-DE');
+
+  doc.setFontSize(16);
+  doc.setFont(undefined, 'bold');
+  doc.text(s.company_name || 'AK Automobile', 14, 20);
+  doc.setFontSize(9);
+  doc.setFont(undefined, 'normal');
+  doc.text([s.address || '', s.phone || ''].filter(Boolean).join(' | '), 14, 27);
+  doc.line(14, 31, 196, 31);
+
+  doc.setFontSize(18);
+  doc.setFont(undefined, 'bold');
+  doc.text('PROBEFAHRT-PROTOKOLL', 105, 42, { align: 'center' });
+
+  let y = 55;
+  doc.setFontSize(10);
+
+  const fields = [
+    ['Datum', today],
+    ['Fahrzeug', vehicle ? vehicle.name : '______________________________'],
+    ['Kennzeichen', '______________________________'],
+    ['Km-Stand vor Fahrt', vehicle ? formatMileage(vehicle.mileage) : '________'],
+    ['Km-Stand nach Fahrt', '________'],
+    ['', ''],
+    ['Fahrer (Name)', customer ? `${customer.first_name} ${customer.last_name}` : '______________________________'],
+    ['Anschrift', customer?.address_street ? `${customer.address_street}, ${customer.address_zip} ${customer.address_city}` : '______________________________'],
+    ['Führerschein-Nr.', '______________________________'],
+    ['Ausstellungsdatum', '______________________________'],
+    ['Ausstellende Behörde', '______________________________']
+  ];
+
+  doc.autoTable({
+    startY: y,
+    body: fields.filter(([l]) => l !== ''),
+    theme: 'plain',
+    styles: { fontSize: 10, cellPadding: 4 },
+    columnStyles: { 0: { fontStyle: 'bold', cellWidth: 55 } },
+    margin: { left: 14, right: 14 }
+  });
+
+  y = doc.lastAutoTable.finalY + 12;
+  doc.setFont(undefined, 'normal');
+  doc.text('Der Fahrer bestätigt:', 14, y);
+  y += 8;
+  const checks = [
+    'Im Besitz einer gültigen Fahrerlaubnis zu sein',
+    'Keine Substanzen zu sich genommen zu haben, die die Fahrtüchtigkeit beeinträchtigen',
+    'Das Fahrzeug pfleglich zu behandeln und die StVO einzuhalten',
+    'Für selbstverschuldete Schäden während der Probefahrt zu haften'
+  ];
+  checks.forEach(c => {
+    doc.rect(14, y - 3, 4, 4);
+    doc.text(c, 22, y);
+    y += 8;
+  });
+
+  y += 12;
+  doc.line(14, y, 85, y);
+  doc.line(110, y, 196, y);
+  y += 5;
+  doc.text('Unterschrift Fahrer', 14, y);
+  doc.text('Unterschrift Händler', 110, y);
+
+  doc.setFontSize(8);
+  doc.text([s.company_name || 'AK Automobile', s.address, s.phone].filter(Boolean).join(' | '), 14, 285);
+
+  doc.save('Probefahrt_Protokoll.pdf');
+  toast.success('Probefahrt-Protokoll erstellt');
+}
+
+/* ---------- #10 Handover Protocol ---------- */
+async function generateHandoverProtocol({ customer, vehicle }) {
+  const settingsArr = await api.fetchAll('settings', { limit: 1 });
+  const s = settingsArr[0] || {};
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const today = new Date().toLocaleDateString('de-DE');
+
+  doc.setFontSize(16);
+  doc.setFont(undefined, 'bold');
+  doc.text(s.company_name || 'AK Automobile', 14, 20);
+  doc.setFontSize(9);
+  doc.setFont(undefined, 'normal');
+  doc.text([s.address || '', s.phone || ''].filter(Boolean).join(' | '), 14, 27);
+  doc.line(14, 31, 196, 31);
+
+  doc.setFontSize(18);
+  doc.setFont(undefined, 'bold');
+  doc.text('ÜBERGABEPROTOKOLL', 105, 42, { align: 'center' });
+
+  let y = 55;
+  doc.setFontSize(10);
+
+  const info = [
+    ['Datum', today],
+    ['Fahrzeug', vehicle ? vehicle.name : '______________________________'],
+    ['Km-Stand', vehicle ? formatMileage(vehicle.mileage) : '________'],
+    ['Käufer', customer ? `${customer.first_name} ${customer.last_name}` : '______________________________']
+  ];
+
+  doc.autoTable({
+    startY: y,
+    body: info,
+    theme: 'plain',
+    styles: { fontSize: 10, cellPadding: 4 },
+    columnStyles: { 0: { fontStyle: 'bold', cellWidth: 40 } },
+    margin: { left: 14, right: 14 }
+  });
+
+  y = doc.lastAutoTable.finalY + 10;
+  doc.setFont(undefined, 'bold');
+  doc.text('Zustandsbeschreibung', 14, y);
+  y += 4;
+
+  const checkItems = [
+    'Karosserie / Lack',
+    'Windschutzscheibe',
+    'Scheinwerfer / Rückleuchten',
+    'Reifen (Profiltiefe)',
+    'Felgen',
+    'Innenraum / Sitze',
+    'Armaturenbrett / Cockpit',
+    'Klimaanlage',
+    'Radio / Navigation',
+    'Kofferraum',
+    'Motorraum',
+    'Unterboden'
+  ];
+
+  doc.autoTable({
+    startY: y,
+    head: [['Bereich', 'OK', 'Mängel', 'Bemerkung']],
+    body: checkItems.map(item => [item, '☐', '☐', '']),
+    styles: { fontSize: 9, cellPadding: 4 },
+    headStyles: { fillColor: [27, 58, 92], textColor: 255 },
+    columnStyles: { 0: { cellWidth: 50 }, 1: { cellWidth: 15, halign: 'center' }, 2: { cellWidth: 20, halign: 'center' } },
+    margin: { left: 14, right: 14 }
+  });
+
+  y = doc.lastAutoTable.finalY + 8;
+  doc.setFont(undefined, 'bold');
+  doc.text('Übergebene Gegenstände', 14, y);
+  y += 4;
+
+  const items = [
+    'Fahrzeugbrief (Zulassungsbescheinigung Teil II)',
+    'Fahrzeugschein (Zulassungsbescheinigung Teil I)',
+    'Serviceheft / Scheckheft',
+    'Betriebsanleitung',
+    'Schlüssel (Anzahl: ___)',
+    'Ersatzrad / Pannenhilfe',
+    'Warndreieck + Verbandskasten',
+    'TÜV/HU-Bericht'
+  ];
+
+  doc.autoTable({
+    startY: y,
+    body: items.map(item => ['☐', item]),
+    theme: 'plain',
+    styles: { fontSize: 9, cellPadding: 3 },
+    columnStyles: { 0: { cellWidth: 10, halign: 'center' } },
+    margin: { left: 14, right: 14 }
+  });
+
+  y = doc.lastAutoTable.finalY + 15;
+  if (y > 255) { doc.addPage(); y = 20; }
+
+  doc.line(14, y, 85, y);
+  doc.line(110, y, 196, y);
+  y += 5;
+  doc.setFont(undefined, 'normal');
+  doc.text('Unterschrift Verkäufer', 14, y);
+  doc.text('Unterschrift Käufer', 110, y);
+
+  doc.setFontSize(8);
+  doc.text([s.company_name || 'AK Automobile', s.address, s.phone].filter(Boolean).join(' | '), 14, 285);
+
+  const safeName = vehicle ? vehicle.name.replace(/[^a-zA-Z0-9_-]/g, '_') : 'Fahrzeug';
+  doc.save(`Uebergabeprotokoll_${safeName}.pdf`);
+  toast.success('Übergabeprotokoll erstellt');
+}

@@ -13,6 +13,9 @@ async function renderFinanceForm(container, transactionId) {
   const t = transaction || {};
   const vehicles = await api.fetchAll('vehicles', { orderBy: 'name' });
   const customers = await api.fetchAll('customers', { orderBy: 'last_name' });
+  const settingsArr = await api.fetchAll('settings', { limit: 1 });
+  const settings = settingsArr[0] || {};
+  const autoInvoiceNr = !isEdit ? `${settings.invoice_prefix || 'AK'}-${new Date().getFullYear()}-${String(settings.invoice_counter || 1).padStart(3, '0')}` : '';
 
   const incomeCategories = ['vehicle_sale', 'commission', 'other'];
   const expenseCategories = ['vehicle_purchase', 'repair', 'operating_cost', 'insurance', 'rent', 'salary', 'other'];
@@ -62,7 +65,7 @@ async function renderFinanceForm(container, transactionId) {
           </div>
           <div class="form-group">
             <label class="form-label">Rechnungsnr.</label>
-            <input type="text" name="invoice_number" class="form-input" value="${escapeHtml(t.invoice_number || '')}" placeholder="z.B. AK-2026-001">
+            <input type="text" name="invoice_number" class="form-input" value="${escapeHtml(t.invoice_number || autoInvoiceNr)}" placeholder="z.B. AK-2026-001">
           </div>
         </div>
 

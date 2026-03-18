@@ -360,6 +360,10 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 .dash-modal-close { background: none; border: none; font-size: 1.3rem; cursor: pointer; color: var(--gray-500); padding: 4px; }
 .dash-modal-body { padding: 20px; }
 
+/* ---------- Margin Display ---------- */
+.margin-info { padding: 8px 0; }
+.margin-value { font-size: 1.2rem; font-weight: 800; margin-top: 4px; }
+
 /* ---------- Image Upload ---------- */
 .image-upload-zone {
   border: 2px dashed var(--gray-300);
